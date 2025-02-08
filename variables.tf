@@ -1,45 +1,94 @@
-# AWS Region
+variable "vpc_cidr" {
+  type = string
+  default = "10.0.0.0"
+}
+
 variable "aws_region" {
-  description = "AWS region to deploy resources"
-  type        = string
-  default     = "us-east-1"
+  type = string
 }
 
-# Key Pair
-variable "key_pair_name" {
-  description = "Name of the key pair to use for EC2 instances"
-  type        = string
+variable "vpc_subnet" {
+  type = map(object({
+    cidr_block = string
+    map_public_ip_on_launch = bool
+    availability_zone = string
+  }))
+  default = {}
 }
 
-# AMI ID
-variable "ami_id" {
-  description = "AMI ID for EC2 instances"
-  type        = string
+#security group
+
+
+variable "sg_name" {
+  type = string
 }
 
-# Instance Types
-variable "jenkins_instance_type" {
-  description = "Instance type for Jenkins server"
-  type        = string
-  default     = "t2.medium"
+variable "aws_instance" {
+  type = map(object({
+    instance_name = string
+    user_data     = string
+  }))
 }
 
-variable "terraform_instance_type" {
-  description = "Instance type for Terraform host"
-  type        = string
-  default     = "t2.micro"
+variable "common_values" {
+  type = object({
+    ami_id            = string
+    instance_type     = string
+    key_pair_name     = string
+    volume_size       = number
+    volume_type       = string
+    vpc_security_group_ids = list(string)
+    subnet_id         = string
+  })
 }
 
-variable "sonarqube_instance_type" {
-  description = "Instance type for SonarQube server"
-  type        = string
-  default     = "t2.medium"
+#Security Group
+
+variable "sg_ingress_rules" {
+  type = list(object({
+    cidr_ipv4   = string
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+  }))
+  default = [
+    {
+      cidr_ipv4   = "10.0.0.0/8"
+      from_port   = 80
+      to_port     = 80
+      ip_protocol = "tcp"
+    },
+    {
+      cidr_ipv4   = "0.0.0.0/0"
+      from_port   = 22
+      to_port     = 22
+      ip_protocol = "tcp"
+    }
+  ]
 }
 
-variable "nexus_instance_type" {
-  description = "Instance type for Nexus server"
-  type        = string
-  default     = "t2.medium"
+variable "sg_egress_rules" {
+  type = list(object({
+    cidr_ipv4   = string
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+  }))
+  default = [
+    {
+      cidr_ipv4   = "0.0.0.0/0"
+      from_port   = 0
+      to_port     = 0
+      ip_protocol = "icmp"
+    }
+  ]
+}
+
+variable "tags" {
+  type = map(string)
+  default = {
+    environment = "dev"
+  }
 }
 
 # Security Group Rules

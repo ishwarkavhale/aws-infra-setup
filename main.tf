@@ -1,54 +1,28 @@
-# Previous configuration remains the same until EC2 instances section
+module "aws_vpc" {
+  source = "./modules/vpc"
+  vpc_cidr = var.vpc_cidr
+}
+
+module "aws_subnet" {
+  source = "./modules/subnet"
+  vpc_id = module.aws_vpc.vpc_id
+  vpc_subnet = var.vpc_subnet
+}
+
+module "security_group" {
+  source = "./modules/security_group"
+  sg_name = var.sg_name
+  vpc_id = module.aws_vpc.vpc_id
+  # sg_ingress_rules = var.sg_ingress_rules
+  # sg_egress_rules = var.sg_egress_rules
+}
 
 # EC2 Instances using the module
-module "jenkins_instance" {
+module "aws_instance" {
   source = "./modules/ec2_instance"
-
-  ami_id            = var.ami_id
-  instance_type     = var.jenkins_instance_type
-  subnet_id         = aws_subnet.public_subnet.id
-  security_group_id = aws_security_group.devops_sg.id
-  key_pair_name     = var.key_pair_name
-  instance_name     = "jenkins"
-  volume_size       = 25
-  user_data        = file("${path.module}/scripts/jenkins-install.sh")
+  
+  common_values = var.common_values  # Pass the common_values object
+  aws_instance  = var.aws_instance   # Pass the map of instances
 }
 
-module "terraform_host_instance" {
-  source = "./modules/ec2_instance"
 
-  ami_id            = var.ami_id
-  instance_type     = var.terraform_instance_type
-  subnet_id         = aws_subnet.public_subnet.id
-  security_group_id = aws_security_group.devops_sg.id
-  key_pair_name     = var.key_pair_name
-  instance_name     = "terraform-host"
-  volume_size       = 25
-  user_data        = file("${path.module}/scripts/terraform-install.sh")
-}
-
-module "sonarqube_instance" {
-  source = "./modules/ec2_instance"
-
-  ami_id            = var.ami_id
-  instance_type     = var.sonarqube_instance_type
-  subnet_id         = aws_subnet.public_subnet.id
-  security_group_id = aws_security_group.devops_sg.id
-  key_pair_name     = var.key_pair_name
-  instance_name     = "sonarqube"
-  volume_size       = 25
-  user_data        = file("${path.module}/scripts/sonarqube-install.sh")
-}
-
-module "nexus_instance" {
-  source = "./modules/ec2_instance"
-
-  ami_id            = var.ami_id
-  instance_type     = var.nexus_instance_type
-  subnet_id         = aws_subnet.public_subnet.id
-  security_group_id = aws_security_group.devops_sg.id
-  key_pair_name     = var.key_pair_name
-  instance_name     = "nexus"
-  volume_size       = 25
-  user_data        = file("${path.module}/scripts/nexus-install.sh")
-}
