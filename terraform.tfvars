@@ -169,8 +169,6 @@ common_values = {
     key_pair_name     = "devops"
     volume_size       = "20"
     volume_type       = "gp2"
-    subnet_id         = "${module.aws_subnet.pubs1_id}"
-    vpc_security_group_ids = ["${module.security_group.security_group_id}"]
 }
 
 tags = {

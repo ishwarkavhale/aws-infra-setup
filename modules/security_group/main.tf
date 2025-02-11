@@ -7,7 +7,7 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this" {
-  for_each = { for idx, rule in var.egress_rules : "rule_${idx}" => rule}
+  for_each = { for idx, rule in var.ingress_rules : "rule_${idx}" => rule}
   security_group_id = aws_security_group.this.id
   ip_protocol = each.value.ip_protocol
   cidr_ipv4 = each.value.cidr_ipv4

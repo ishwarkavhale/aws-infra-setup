@@ -37,8 +37,6 @@ variable "common_values" {
     key_pair_name     = string
     volume_size       = number
     volume_type       = string
-    vpc_security_group_ids = list(string)
-    subnet_id         = string
   })
 }
 
